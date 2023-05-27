@@ -1,0 +1,14 @@
+{
+  "name": "battleball",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Habbo's Battleball recreation using PixiJS and Colyseus",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pedro Fontoura",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  }
+}

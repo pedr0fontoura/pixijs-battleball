@@ -1,0 +1,19 @@
+{
+  "name": "@battleball/client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "author": "Pedro Fontoura",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.4",
+    "vite": "^4.3.9"
+  },
+  "dependencies": {
+    "pixi.js": "^7.2.4"
+  }
+}
