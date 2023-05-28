@@ -2,8 +2,6 @@
   <img alt="Altaliza" src=".github/images/battleball.gif" />
 </div>
 
-<br/>
-
 # PixiJS Battleball
 
 This project aims to demonstrate the use of PixiJS and Colyseus while re-creating Habbo's classic mini-game Battleball.
