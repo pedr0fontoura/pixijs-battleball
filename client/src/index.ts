@@ -1,17 +1,6 @@
-import { Application } from 'pixi.js'
+import { TILE_MAP } from './constants';
+import { Game } from './game';
 
-const isHTMLCanvasElement = (element: HTMLElement | null): element is HTMLCanvasElement => {
-  return element?.tagName === 'CANVAS';
-}
+const game = new Game();
 
-const view = document.getElementById('app')
-
-if (!isHTMLCanvasElement(view)) {
-  throw new Error('Failed to locate the application container')
-}
-
-const app = new Application({
-  view,
-  resizeTo: document.body,
-  backgroundColor: '#72cce9'
-});
+game.init(TILE_MAP);
