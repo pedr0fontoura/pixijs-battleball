@@ -1,7 +1,8 @@
-import { Application, Spritesheet, BaseTexture, Container, Sprite, SCALE_MODES } from 'pixi.js';
+import { Application, Container, Sprite } from 'pixi.js';
 
-import { COLORS, Tiles, TILE_WIDTH, TILE_HEIGHT, TILE_ATLAS } from './constants';
+import { COLORS, Tiles, TILE_WIDTH, TILE_HEIGHT } from './constants';
 import { isHTMLCanvasElement } from './utils';
+import { GameAssets, loadGameAssets } from './assets';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -16,8 +17,9 @@ interface Point {
 export class Game {
   public app: Application;
 
+  public assets: GameAssets | undefined;
+
   public tileMap: Tiles[][] | undefined;
-  public tiles: Spritesheet | undefined;
 
   constructor() {
     const view = document.getElementById('app');
@@ -40,12 +42,7 @@ export class Game {
   public async init(tileMap: Tiles[][]): Promise<void> {
     this.tileMap = tileMap;
 
-    const tileSpritesheetTexture = BaseTexture.from(TILE_ATLAS.meta.image);
-    tileSpritesheetTexture.scaleMode = SCALE_MODES.NEAREST;
-
-    this.tiles = new Spritesheet(tileSpritesheetTexture, TILE_ATLAS);
-
-    await this.tiles.parse();
+    this.assets = await loadGameAssets();
 
     const world = this.createWorld();
 
@@ -60,8 +57,8 @@ export class Game {
   }
 
   public createWorld(): Container {
-    if (!this.tiles) {
-      throw new Error("Can't create the world without loading the tiles spritesheet");
+    if (!this.assets) {
+      throw new Error("Can't create the world without loading the game assets");
     }
 
     if (!this.tileMap) {
@@ -83,7 +80,7 @@ export class Game {
 
         const screen = this.toScreen(x, y);
 
-        const tile = new Sprite(this.tiles.textures['default']);
+        const tile = new Sprite(this.assets.tiles.textures.default);
         tile.x = screen.x;
         tile.y = screen.y;
 
