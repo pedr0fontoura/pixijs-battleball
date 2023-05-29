@@ -19,8 +19,8 @@ export const TILE_MAP: Tiles[][] = [
   [0, 0, 1, 1, 1, 1, 0, 0],
 ];
 
-export const TILE_WIDTH = 30;
-export const TILE_HEIGHT = 15;
+export const TILE_WIDTH = 32;
+export const TILE_HEIGHT = 16;
 
 export const TILE_ATLAS = {
   frames: {
@@ -109,11 +109,16 @@ export const TILE_ATLAS = {
       sourceSize: { w: TILE_WIDTH, h: TILE_HEIGHT },
       spriteSourceSize: { x: 0, y: 0, w: TILE_WIDTH, h: TILE_HEIGHT },
     },
+    marker: {
+      frame: { x: 0, y: TILE_HEIGHT * 5, w: 34, h: 17 },
+      sourceSize: { w: 34, h: 17 },
+      spriteSourceSize: { x: 0, y: 0, w: 34, h: 17 },
+    },
   },
   meta: {
     image: 'assets/tiles.png',
     format: 'RGBA8888',
-    size: { w: TILE_WIDTH * 4, h: TILE_HEIGHT * 5 },
+    size: { w: 128, h: 97 },
     scale: '1',
   },
   animations: {

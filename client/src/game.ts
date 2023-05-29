@@ -1,4 +1,4 @@
-import { Application, Container, Sprite } from 'pixi.js';
+import { Application, Container, Sprite, Point } from 'pixi.js';
 
 import { COLORS, Tiles, TILE_WIDTH, TILE_HEIGHT } from './constants';
 import { isHTMLCanvasElement } from './utils';
@@ -9,17 +9,16 @@ declare global {
   var __PIXI_APP__: Application;
 }
 
-interface Point {
-  x: number;
-  y: number;
-}
-
 export class Game {
   public app: Application;
+
+  public origin: Point;
+  public selected: Point;
 
   public assets: GameAssets | undefined;
 
   public tileMap: Tiles[][] | undefined;
+  public marker: Sprite | undefined;
 
   constructor() {
     const view = document.getElementById('app');
@@ -35,6 +34,32 @@ export class Game {
       antialias: false, // Game uses a pixelated art style
     });
 
+    // Origin in tile space
+    this.origin = new Point(
+      Math.floor(this.app.view.width / 2 / TILE_WIDTH),
+      Math.floor(this.app.view.height / 2 / TILE_HEIGHT)
+    );
+
+    this.selected = new Point(0, 0);
+
+    this.app.stage.eventMode = 'static';
+
+    this.app.stage.onglobalpointermove = (e) => {
+      const tile = this.toTile(e.globalX, e.globalY);
+      const world = this.toWorld(tile.x, tile.y);
+
+      this.selected.x = world.x;
+      this.selected.y = world.y;
+
+      if (this.marker) {
+        const screen = this.toScreen(world.x, world.y);
+
+        // Marker needs to be center aligned with the tile sprite
+        this.marker.x = screen.x - (this.marker.width - TILE_WIDTH) / 2;
+        this.marker.y = screen.y - (this.marker.height - TILE_HEIGHT) / 2;
+      }
+    };
+
     // Expose Pixi instance to DEVTOOLS
     globalThis.__PIXI_APP__ = this.app;
   }
@@ -45,15 +70,27 @@ export class Game {
     this.assets = await loadGameAssets();
 
     const world = this.createWorld();
+    const marker = new Sprite(this.assets.tiles.textures.marker);
+
+    this.marker = marker;
 
     this.app.stage.addChild(world);
+    this.app.stage.addChild(marker);
   }
 
   public toScreen(x: number, y: number): Point {
-    return {
-      x: this.app.view.width / 2 + (x - y) * Math.floor(TILE_WIDTH / 2),
-      y: this.app.view.height / 2 + (x + y) * Math.floor(TILE_HEIGHT / 2),
-    };
+    return new Point(
+      this.origin.x * TILE_WIDTH + (x - y) * (TILE_WIDTH / 2),
+      this.origin.y * TILE_HEIGHT + (x + y) * (TILE_HEIGHT / 2)
+    );
+  }
+
+  public toTile(x: number, y: number): Point {
+    return new Point(Math.floor(x / TILE_WIDTH), Math.floor(y / TILE_HEIGHT));
+  }
+
+  public toWorld(x: number, y: number): Point {
+    return new Point(y - this.origin.y + (x - this.origin.x), y - this.origin.y - (x - this.origin.x));
   }
 
   public createWorld(): Container {
