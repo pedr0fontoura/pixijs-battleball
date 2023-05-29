@@ -1,4 +1,4 @@
-import { Application, Container, Sprite, Point } from 'pixi.js';
+import { Application, Container, Sprite, Point, Polygon } from 'pixi.js';
 
 import { COLORS, Tiles, TILE_WIDTH, TILE_HEIGHT } from './constants';
 import { isHTMLCanvasElement } from './utils';
@@ -42,23 +42,7 @@ export class Game {
 
     this.selected = new Point(0, 0);
 
-    this.app.stage.eventMode = 'static';
-
-    this.app.stage.onglobalpointermove = (e) => {
-      const tile = this.toTile(e.globalX, e.globalY);
-      const world = this.toWorld(tile.x, tile.y);
-
-      this.selected.x = world.x;
-      this.selected.y = world.y;
-
-      if (this.marker) {
-        const screen = this.toScreen(world.x, world.y);
-
-        // Marker needs to be center aligned with the tile sprite
-        this.marker.x = screen.x - (this.marker.width - TILE_WIDTH) / 2;
-        this.marker.y = screen.y - (this.marker.height - TILE_HEIGHT) / 2;
-      }
-    };
+    this.app.ticker.add(this.tick);
 
     // Expose Pixi instance to DEVTOOLS
     globalThis.__PIXI_APP__ = this.app;
@@ -77,6 +61,16 @@ export class Game {
     this.app.stage.addChild(world);
     this.app.stage.addChild(marker);
   }
+
+  public tick = (): void => {
+    if (this.marker) {
+      const screen = this.toScreen(this.selected.x, this.selected.y);
+
+      // Marker needs to be center aligned with the tile sprite
+      this.marker.x = screen.x - (this.marker.width - TILE_WIDTH) / 2;
+      this.marker.y = screen.y - (this.marker.height - TILE_HEIGHT) / 2;
+    }
+  };
 
   public toScreen(x: number, y: number): Point {
     return new Point(
@@ -118,8 +112,28 @@ export class Game {
         const screen = this.toScreen(x, y);
 
         const tile = new Sprite(this.assets.tiles.textures.default);
+
+        tile.hitArea = new Polygon([
+          0,
+          TILE_HEIGHT / 2,
+          TILE_WIDTH / 2,
+          0,
+          TILE_WIDTH,
+          TILE_HEIGHT / 2,
+          TILE_WIDTH / 2,
+          TILE_HEIGHT / 2,
+        ]);
+
+        tile.onpointerenter = () => {
+          this.selected.x = x;
+          this.selected.y = y;
+        };
+
         tile.x = screen.x;
         tile.y = screen.y;
+
+        // Better cursor detection than static
+        tile.eventMode = 'dynamic';
 
         world.addChild(tile);
       }
