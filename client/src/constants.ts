@@ -8,6 +8,16 @@ export enum Tiles {
   DEFAULT = 1,
 }
 
+export enum TeamColors {
+  NEUTRAL,
+  RED,
+  BLUE,
+  YELLOW,
+  GREEN,
+}
+
+export const MAX_TILE_LEVEL = 4;
+
 export const TILE_MAP: Tiles[][] = [
   [0, 0, 1, 1, 1, 1, 0, 0],
   [0, 0, 1, 1, 1, 1, 0, 0],
